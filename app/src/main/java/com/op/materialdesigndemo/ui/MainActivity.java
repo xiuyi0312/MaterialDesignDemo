@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,7 +14,9 @@ import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.op.materialdesigndemo.R;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         binding.main.recyclerview.setItemAnimator(new DefaultItemAnimator());
         binding.main.recyclerview.setAdapter(newsAdapter);
         binding.main.recyclerview.setLayoutManager(new LinearLayoutManager(this));
+//        binding.main.recyclerview.setLayoutManager(new GridLayoutManager(this, 2));
 
         initData();
     }
@@ -78,8 +80,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if (item.getItemId() == android.R.id.home) {
             binding.drawer.openDrawer(GravityCompat.START | Gravity.LEFT);
             return true;
-        } else if (item.getItemId() == R.id.add) {
-            Toast.makeText(this, "add pressed", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.sort) {
+            newsAdapter.switchLayout();
+            binding.main.recyclerview.setLayoutManager(newsAdapter.isVertical() ?
+                    new LinearLayoutManager(this) : new GridLayoutManager(this, 2));
             return true;
         }
         return super.onOptionsItemSelected(item);

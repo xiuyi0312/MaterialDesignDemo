@@ -8,9 +8,9 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/more"
-        android:icon="@drawable/ic_baseline_more_horiz_24"
-        android:title="more"
+        android:id="@+id/sort"
+        android:icon="@drawable/ic_baseline_sort_24"
+        android:title="sort"
         android:visible="true"
         app:showAsAction="always" />
 

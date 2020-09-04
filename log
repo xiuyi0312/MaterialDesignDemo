@@ -1,3 +1,7 @@
 1---NavigationView
 2---FloatingActionBar + SnackBar
+3---Record your reading footprint
+    when    checked     finished    comment     shared
+4---Show the footprint in Calendar
+
 

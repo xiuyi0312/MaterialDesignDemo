@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.op.materialdesigndemo.R;
 import com.op.materialdesigndemo.databinding.ActivityDetailBinding;
 import com.op.materialdesigndemo.entity.StoryDetail;
+import com.op.materialdesigndemo.util.HtmlGenerator;
 import com.op.materialdesigndemo.vm.NewsViewModel;
 
 public class DetailActivity extends AppCompatActivity {
@@ -58,10 +59,11 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setContent(StoryDetail storyDetail) {
-        binding.content.setText(storyDetail.getBody());
+        binding.content.loadData(HtmlGenerator.generateHtml(storyDetail), "text/html; charset=utf-8", "utf-8");
         Glide.with(binding.cover).load(storyDetail.getImage()).into(binding.cover);
         // set tht article title to the CollapsingToolbarLayout not the toolbar
         binding.collapsing.setTitle(storyDetail.getTitle());
+        binding.imageSource.setText(storyDetail.getImage_source());
     }
 
     @Override

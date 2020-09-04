@@ -43,6 +43,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         binding.main.swipeRefresh.setOnRefreshListener(this);
 
         newsAdapter = new NewsAdapter<Story>(this);
+        newsAdapter.setListener(new NewsAdapter.ItemOnClickListener<Story>() {
+            @Override
+            public void onItemClick(Story item) {
+                DetailActivity.startActivity(MainActivity.this, item.getId());
+            }
+        });
         binding.main.recyclerview.setItemAnimator(new DefaultItemAnimator());
         binding.main.recyclerview.setAdapter(newsAdapter);
         binding.main.recyclerview.setLayoutManager(new LinearLayoutManager(this));

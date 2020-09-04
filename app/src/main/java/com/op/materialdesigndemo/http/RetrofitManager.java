@@ -42,4 +42,8 @@ public class RetrofitManager {
     public Observable<ResponseBody> getLatestNews() {
         return newsService.getLatestNews();
     }
+
+    public Observable<ResponseBody> getNewsDetail(int id) {
+        return newsService.getNewsDetail(id);
+    }
 }

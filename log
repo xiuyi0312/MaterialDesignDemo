@@ -3,5 +3,12 @@
 3---Record your reading footprint
     when    checked     finished    comment     shared
 4---Show the footprint in Calendar
+5---NavigationView
+    header ----Date + Weather +
+    menu
+           ----footprint
+           ----settings
+           ----about
+
 
 

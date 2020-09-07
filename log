@@ -12,3 +12,11 @@
 
 
 
+6 instructions for usage of ROOM
+    add dependencies
+    create Class annotated with @Entity
+    create Dao Class annotated with @Dao
+    create abstract Database Class annotated with @Database and with abstract getXxxDao methods
+    create singleton helper Class for users to operate database and implement XxxDao interface if needed or add methods to operate database inside.
+
+

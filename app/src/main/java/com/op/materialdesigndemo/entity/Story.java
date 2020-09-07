@@ -3,29 +3,61 @@ package com.op.materialdesigndemo.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.op.materialdesigndemo.db.TypeConvertersForDb;
+
 import java.util.List;
 
+@Entity
 public class Story implements Parcelable {
+    @PrimaryKey
+    private int id;
+    @Ignore
     private String image_hue;
     private String title;
     private String hint;
+    @Ignore
     private String ga_prefix;
+    @TypeConverters(TypeConvertersForDb.class)
     private List<String> images;
     private int type;
-    private int id;
+    private long publishTime;
 
     public Story() {
 
     }
 
+
     protected Story(Parcel in) {
+        id = in.readInt();
         image_hue = in.readString();
         title = in.readString();
         hint = in.readString();
         ga_prefix = in.readString();
         images = in.createStringArrayList();
         type = in.readInt();
-        id = in.readInt();
+        publishTime = in.readLong();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(image_hue);
+        dest.writeString(title);
+        dest.writeString(hint);
+        dest.writeString(ga_prefix);
+        dest.writeStringList(images);
+        dest.writeInt(type);
+        dest.writeLong(publishTime);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Story> CREATOR = new Creator<Story>() {
@@ -39,22 +71,6 @@ public class Story implements Parcelable {
             return new Story[size];
         }
     };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(image_hue);
-        dest.writeString(title);
-        dest.writeString(hint);
-        dest.writeString(ga_prefix);
-        dest.writeStringList(images);
-        dest.writeInt(type);
-        dest.writeInt(id);
-    }
 
     public String getImage_hue() {
         return image_hue;
@@ -110,5 +126,13 @@ public class Story implements Parcelable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public long getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(long publishTime) {
+        this.publishTime = publishTime;
     }
 }

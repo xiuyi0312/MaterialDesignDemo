@@ -1,21 +1,28 @@
 package com.op.materialdesigndemo.vm;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.google.gson.Gson;
+import com.op.materialdesigndemo.R;
+import com.op.materialdesigndemo.db.BehaviorDatabaseHelper;
 import com.op.materialdesigndemo.entity.NewsResp;
 import com.op.materialdesigndemo.entity.Story;
 import com.op.materialdesigndemo.entity.StoryDetail;
+import com.op.materialdesigndemo.entity.UserBehavior;
 import com.op.materialdesigndemo.http.ApiException;
 import com.op.materialdesigndemo.http.HttpCallback;
 import com.op.materialdesigndemo.http.RetrofitManager;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,10 +31,15 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 
-public class NewsViewModel extends ViewModel {
+public class NewsViewModel extends AndroidViewModel {
     public final MutableLiveData<List<Story>> newsMutableLiveData = new MutableLiveData<>();
     public final MutableLiveData<StoryDetail> storyDetailMutableLiveData = new MutableLiveData<>();
     public final MutableLiveData<Bitmap> bitmapMutableLiveData = new MutableLiveData<>();
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyDDmm");
+
+    public NewsViewModel(@NonNull Application application) {
+        super(application);
+    }
 
     @SuppressLint("CheckResult")
     public void getLatestNews() {
@@ -36,6 +48,17 @@ public class NewsViewModel extends ViewModel {
                 NewsResp.class, new HttpCallback<NewsResp>() {// 响应部分
                     @Override
                     public void onSuccess(NewsResp result) {
+                        List<Story> stories = result.getStories();
+                        long publishTime = -1L;
+                        try {
+                            publishTime = simpleDateFormat.parse(result.getDate()).getTime();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        for (Story story : stories) {
+                            story.setPublishTime(publishTime);
+                        }
+                        BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceStory(stories);
                         newsMutableLiveData.postValue(result.getStories());
                     }
 
@@ -98,5 +121,19 @@ public class NewsViewModel extends ViewModel {
 
                     }
                 });
+    }
+
+    public void insertUserBehavior(int opType, int storyId) {
+        UserBehavior behavior = new UserBehavior();
+        behavior.setOpType(opType);
+        behavior.setStoryId(storyId);
+        behavior.setUpdateTime(System.currentTimeMillis());
+        BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceBehavior(behavior);
+    }
+
+    public String getStatistics() {
+        return String.format(getApplication().getString(R.string.statistics),
+                BehaviorDatabaseHelper.getInstance(getApplication()).getStoryCount(),
+                BehaviorDatabaseHelper.getInstance(getApplication()).getUserBehaviorCount());
     }
 }

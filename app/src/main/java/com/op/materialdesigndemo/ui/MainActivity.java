@@ -1,11 +1,13 @@
 package com.op.materialdesigndemo.ui;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -25,13 +28,22 @@ import com.op.materialdesigndemo.adapter.NewsAdapter;
 import com.op.materialdesigndemo.databinding.ActivityMainBinding;
 import com.op.materialdesigndemo.databinding.LayoutMenuHeaderBinding;
 import com.op.materialdesigndemo.entity.Story;
+import com.op.materialdesigndemo.entity.UserBehavior;
 import com.op.materialdesigndemo.vm.NewsViewModel;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,
         NavigationView.OnNavigationItemSelectedListener {
     private ActivityMainBinding binding;
+    private LayoutMenuHeaderBinding menuHeaderBinding;
     private NewsAdapter newsAdapter;
     private NewsViewModel viewModel;
 
@@ -39,32 +51,43 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        menuHeaderBinding = DataBindingUtil.bind(binding.menu.navigation.getHeaderView(0));
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
 
+        initViewAndListeners();
+        initData();
+    }
+
+    private void initViewAndListeners() {
         binding.menu.navigation.setNavigationItemSelectedListener(this);
+        binding.drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                updateMenu();
+            }
+        });
 
         binding.main.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         binding.main.swipeRefresh.setOnRefreshListener(this);
 
         newsAdapter = new NewsAdapter<Story>(this);
-        newsAdapter.setListener(new NewsAdapter.ItemOnClickListener<Story>() {
-            @Override
-            public void onItemClick(Story item) {
-                DetailActivity.startActivity(MainActivity.this, item.getId());
-            }
-        });
         binding.main.recyclerview.setItemAnimator(new DefaultItemAnimator());
         binding.main.recyclerview.setAdapter(newsAdapter);
         binding.main.recyclerview.setLayoutManager(new LinearLayoutManager(this));
-//        binding.main.recyclerview.setLayoutManager(new GridLayoutManager(this, 2));
-
-        initData();
+        newsAdapter.setListener(new NewsAdapter.ItemOnClickListener<Story>() {
+            @Override
+            public void onItemClick(Story item) {
+                // TODO: 2020/9/5 add or update User Behavior record
+                viewModel.insertUserBehavior(UserBehavior.OP_CLICK, item.getId());
+                DetailActivity.startActivity(MainActivity.this, item.getId());
+            }
+        });
     }
 
     private void initData() {
-        viewModel = new NewsViewModel();
+        viewModel = new NewsViewModel(getApplication());
         viewModel.newsMutableLiveData.observe(this, new Observer<List<Story>>() {
             @Override
             public void onChanged(List<Story> news) {
@@ -81,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
         viewModel.getLatestNews();
-//        viewModel.getAvatar("");
     }
 
     @Override
@@ -107,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     public void onRefresh() {
         viewModel.getLatestNews();
-        viewModel.getAvatar("");
         binding.main.swipeRefresh.setRefreshing(false);
     }
 
@@ -122,5 +143,23 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
         binding.drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @SuppressLint("CheckResult")
+    private void updateMenu() {
+        Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                emitter.onNext(viewModel.getStatistics());
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String info) throws Exception {
+                        menuHeaderBinding.name.setText(info);
+                    }
+                });
+
     }
 }

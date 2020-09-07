@@ -34,7 +34,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new NewsViewModel();
+        viewModel = new NewsViewModel(getApplication());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
         setSupportActionBar(binding.toolbar);
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);

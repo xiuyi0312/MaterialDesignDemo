@@ -23,6 +23,7 @@ public class UserBehavior implements Parcelable {
     private int storyId;
     private int opType;// click read comment share
     private long updateTime;// when user operate the last time
+    private String comment;
 
     public UserBehavior() {
 
@@ -32,6 +33,20 @@ public class UserBehavior implements Parcelable {
         storyId = in.readInt();
         opType = in.readInt();
         updateTime = in.readLong();
+        comment = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(storyId);
+        dest.writeInt(opType);
+        dest.writeLong(updateTime);
+        dest.writeString(comment);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<UserBehavior> CREATOR = new Creator<UserBehavior>() {
@@ -70,15 +85,11 @@ public class UserBehavior implements Parcelable {
         this.updateTime = updateTime;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getComment() {
+        return comment;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(storyId);
-        dest.writeInt(opType);
-        dest.writeLong(updateTime);
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

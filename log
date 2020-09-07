@@ -1,7 +1,7 @@
 1---NavigationView
 2---FloatingActionBar + SnackBar
 3---Record your reading footprint
-    when    checked     finished    comment     shared
+    when    checked     finished    comment(add delete check and update)     shared
 4---Show the footprint in Calendar
 5---NavigationView
     header ----Date + Weather +

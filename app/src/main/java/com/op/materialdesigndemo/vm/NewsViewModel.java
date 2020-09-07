@@ -131,6 +131,15 @@ public class NewsViewModel extends AndroidViewModel {
         BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceBehavior(behavior);
     }
 
+    public void updateUserBehaviorWithComment(int opType, int storyId, String comment) {
+        UserBehavior behavior = new UserBehavior();
+        behavior.setOpType(opType);
+        behavior.setStoryId(storyId);
+        behavior.setUpdateTime(System.currentTimeMillis());
+        behavior.setComment(comment);
+        BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceBehavior(behavior);
+    }
+
     public String getStatistics() {
         return String.format(getApplication().getString(R.string.statistics),
                 BehaviorDatabaseHelper.getInstance(getApplication()).getStoryCount(),

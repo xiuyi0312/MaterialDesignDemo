@@ -3,6 +3,8 @@ package com.op.materialdesigndemo.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,18 +14,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.snackbar.Snackbar;
 import com.op.materialdesigndemo.R;
 import com.op.materialdesigndemo.databinding.ActivityDetailBinding;
 import com.op.materialdesigndemo.entity.StoryDetail;
+import com.op.materialdesigndemo.entity.UserBehavior;
 import com.op.materialdesigndemo.util.HtmlGenerator;
 import com.op.materialdesigndemo.vm.NewsViewModel;
 
 public class DetailActivity extends AppCompatActivity {
     private ActivityDetailBinding binding;
     private NewsViewModel viewModel;
+    private int id;
 
     public static void startActivity(Context context, int id) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -37,6 +43,12 @@ public class DetailActivity extends AppCompatActivity {
         viewModel = new NewsViewModel(getApplication());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
         setSupportActionBar(binding.toolbar);
+
+        initViewAndListeners();
+        initData();
+    }
+
+    private void initViewAndListeners() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,7 +56,20 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
             }
         });
-        initData();
+
+        binding.fabFinish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.insertUserBehavior(UserBehavior.OP_READ, id);
+                Snackbar.make(v, "Congrats and wanna comment now", Snackbar.LENGTH_LONG).setAction("Okay", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("News", "Comment now");
+                        CommentFragment.getInstance(id).show(getSupportFragmentManager(), "COMMENT_FRAGMENT");
+                    }
+                }).show();
+            }
+        });
     }
 
     private void initData() {
@@ -54,7 +79,7 @@ public class DetailActivity extends AppCompatActivity {
                 setContent(storyDetail);
             }
         });
-        int id = getIntent().getIntExtra("news_id", 0);
+        id = getIntent().getIntExtra("news_id", 0);
         viewModel.getNewsDetail(id);
     }
 

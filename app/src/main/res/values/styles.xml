@@ -14,4 +14,9 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="CommentDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_gravity">bottom</item>
+    </style>
+
 </resources>

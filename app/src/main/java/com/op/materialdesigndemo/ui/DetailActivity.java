@@ -21,15 +21,25 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 import com.op.materialdesigndemo.R;
 import com.op.materialdesigndemo.databinding.ActivityDetailBinding;
+import com.op.materialdesigndemo.db.BehaviorDatabaseHelper;
+import com.op.materialdesigndemo.entity.Story;
 import com.op.materialdesigndemo.entity.StoryDetail;
 import com.op.materialdesigndemo.entity.UserBehavior;
 import com.op.materialdesigndemo.util.HtmlGenerator;
 import com.op.materialdesigndemo.vm.NewsViewModel;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 public class DetailActivity extends AppCompatActivity {
     private ActivityDetailBinding binding;
     private NewsViewModel viewModel;
-    private int id;
+    private Story story;
+    private UserBehavior userBehavior;
 
     public static void startActivity(Context context, int id) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -44,8 +54,8 @@ public class DetailActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
         setSupportActionBar(binding.toolbar);
 
-        initViewAndListeners();
         initData();
+        initViewAndListeners();
     }
 
     private void initViewAndListeners() {
@@ -56,18 +66,21 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
             }
         });
-
         binding.fabFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.insertUserBehavior(UserBehavior.OP_READ, id);
-                Snackbar.make(v, "Congrats and wanna comment now", Snackbar.LENGTH_LONG).setAction("Okay", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.d("News", "Comment now");
-                        CommentFragment.getInstance(id).show(getSupportFragmentManager(), "COMMENT_FRAGMENT");
-                    }
-                }).show();
+                if (userBehavior != null && userBehavior.hasRead()) {
+                    CommentFragment.getInstance(story.getId()).show(getSupportFragmentManager(), "COMMENT_FRAGMENT");
+                } else {
+                    viewModel.insertUserBehavior(UserBehavior.OP_READ, story.getId());
+                    Snackbar.make(v, "Congrats and wanna comment now", Snackbar.LENGTH_LONG).setAction("Okay", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d("News", "Comment now");
+                            CommentFragment.getInstance(story.getId()).show(getSupportFragmentManager(), "COMMENT_FRAGMENT");
+                        }
+                    }).show();
+                }
             }
         });
     }
@@ -79,8 +92,49 @@ public class DetailActivity extends AppCompatActivity {
                 setContent(storyDetail);
             }
         });
-        id = getIntent().getIntExtra("news_id", 0);
+        final int id = getIntent().getIntExtra("news_id", 0);
         viewModel.getNewsDetail(id);
+
+        Observable.create(new ObservableOnSubscribe<Story>() {
+            @Override
+            public void subscribe(ObservableEmitter<Story> emitter) throws Exception {
+                Story storyById = BehaviorDatabaseHelper.getInstance(DetailActivity.this)
+                        .getStoryById(id);
+                emitter.onNext(storyById);
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Story>() {
+                    @Override
+                    public void accept(Story story) throws Exception {
+                        DetailActivity.this.story = story;
+                    }
+                });
+
+        Observable.create(new ObservableOnSubscribe<UserBehavior>() {
+            @Override
+            public void subscribe(ObservableEmitter<UserBehavior> emitter) throws Exception {
+                UserBehavior userBehaviorById = BehaviorDatabaseHelper.getInstance(DetailActivity.this)
+                        .getUserBehaviorById(id);
+                if (userBehaviorById == null) {
+                    userBehaviorById = new UserBehavior();
+                    userBehaviorById.setStoryId(id);
+                }
+                emitter.onNext(userBehaviorById);
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<UserBehavior>() {
+                    @Override
+                    public void accept(UserBehavior userBehavior) throws Exception {
+                        DetailActivity.this.userBehavior = userBehavior;
+                        if (userBehavior != null && userBehavior.hasRead()) {
+                            binding.fabFinish.setImageResource(R.drawable.ic_baseline_insert_comment_24);
+                        } else {
+                            binding.fabFinish.setImageResource(R.drawable.ic_baseline_check_24_white);
+                        }
+                    }
+                });
     }
 
     private void setContent(StoryDetail storyDetail) {

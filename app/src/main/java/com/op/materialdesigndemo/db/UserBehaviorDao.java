@@ -17,6 +17,8 @@ public interface UserBehaviorDao {
     List<UserBehavior> getBehaviorsDuring(long startTime, long endTime);
     @Query("select count(*) from user_behavior")
     int getBehaviorCount();
+    @Query("select * from user_behavior where storyId = :id")
+    UserBehavior getBehaviorById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(UserBehavior... behaviors);

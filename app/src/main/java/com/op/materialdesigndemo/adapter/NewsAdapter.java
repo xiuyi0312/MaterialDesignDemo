@@ -71,9 +71,9 @@ public class NewsAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         if (vertical) {
-            ((NewsViewHolder) holder).updateView(newsList.get(position));
+            ((NewsViewHolder) holder).updateView(context, newsList.get(position));
         } else {
-            ((GridNewsViewHolder) holder).updateView(newsList.get(position));
+            ((GridNewsViewHolder) holder).updateView(context, newsList.get(position));
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -26,8 +26,12 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 
@@ -123,21 +127,65 @@ public class NewsViewModel extends AndroidViewModel {
                 });
     }
 
-    public void insertUserBehavior(int opType, int storyId) {
-        UserBehavior behavior = new UserBehavior();
-        behavior.setOpType(opType);
-        behavior.setStoryId(storyId);
-        behavior.setUpdateTime(System.currentTimeMillis());
-        BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceBehavior(behavior);
+    public void insertUserBehavior(final int opType, final int storyId) {
+        Observable.create(new ObservableOnSubscribe<UserBehavior>() {
+            @Override
+            public void subscribe(ObservableEmitter<UserBehavior> emitter) throws Exception {
+                UserBehavior userBehavior = BehaviorDatabaseHelper.getInstance(getApplication())
+                        .getUserBehaviorById(storyId);
+                if (userBehavior == null) {
+                    userBehavior = new UserBehavior();
+                    userBehavior.setStoryId(storyId);
+                }
+                emitter.onNext(userBehavior);
+            }
+        }).subscribeOn(Schedulers.io())
+                .map(new Function<UserBehavior, UserBehavior>() {
+                    @Override
+                    public UserBehavior apply(UserBehavior userBehavior) throws Exception {
+                        userBehavior.setOpType(userBehavior.getOpType()|opType);
+                        userBehavior.setUpdateTime(System.currentTimeMillis());
+                        return userBehavior;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<UserBehavior>() {
+                    @Override
+                    public void accept(UserBehavior userBehavior) throws Exception {
+                        BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceBehavior(userBehavior);
+                    }
+                });
     }
 
-    public void updateUserBehaviorWithComment(int opType, int storyId, String comment) {
-        UserBehavior behavior = new UserBehavior();
-        behavior.setOpType(opType);
-        behavior.setStoryId(storyId);
-        behavior.setUpdateTime(System.currentTimeMillis());
-        behavior.setComment(comment);
-        BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceBehavior(behavior);
+    public void updateUserBehaviorWithComment(final int opType, final int storyId, final String comment) {
+        Observable.create(new ObservableOnSubscribe<UserBehavior>() {
+            @Override
+            public void subscribe(ObservableEmitter<UserBehavior> emitter) throws Exception {
+                UserBehavior userBehavior = BehaviorDatabaseHelper.getInstance(getApplication())
+                        .getUserBehaviorById(storyId);
+                if (userBehavior == null) {
+                    userBehavior = new UserBehavior();
+                    userBehavior.setStoryId(storyId);
+                }
+                emitter.onNext(userBehavior);
+            }
+        }).subscribeOn(Schedulers.io())
+                .map(new Function<UserBehavior, UserBehavior>() {
+                    @Override
+                    public UserBehavior apply(UserBehavior userBehavior) throws Exception {
+                        userBehavior.setOpType(userBehavior.getOpType()|opType);
+                        userBehavior.setUpdateTime(System.currentTimeMillis());
+                        userBehavior.setComment(comment);
+                        return userBehavior;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<UserBehavior>() {
+                    @Override
+                    public void accept(UserBehavior userBehavior) throws Exception {
+                        BehaviorDatabaseHelper.getInstance(getApplication()).insertOrReplaceBehavior(userBehavior);
+                    }
+                });
     }
 
     public String getStatistics() {

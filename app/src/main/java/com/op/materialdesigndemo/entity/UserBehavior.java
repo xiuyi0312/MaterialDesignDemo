@@ -92,4 +92,16 @@ public class UserBehavior implements Parcelable {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    public boolean hasRead() {
+        return (opType & OP_READ) > 0;
+    }
+
+    public boolean hasComment() {
+        return (opType & OP_COMMENT) > 0;
+    }
+
+    public boolean hasClicked() {
+        return (opType & OP_CLICK) > 0;
+    }
 }

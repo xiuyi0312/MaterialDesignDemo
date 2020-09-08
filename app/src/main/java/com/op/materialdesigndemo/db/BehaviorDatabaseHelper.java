@@ -50,6 +50,14 @@ public class BehaviorDatabaseHelper {
         }
     }
 
+    public UserBehavior getUserBehaviorById(int id) {
+        return userBehaviorDaoHelper.getBehaviorById(id);
+    }
+
+    public Story getStoryById(int id) {
+        return storyDaoHelper.getStoryById(id);
+    }
+
     public int getStoryCount() {
         return storyDaoHelper.getStoryCount();
     }
@@ -90,6 +98,12 @@ public class BehaviorDatabaseHelper {
         public int getStoryCount() {
             checkThread();
             return storyDao.getStoryCount();
+        }
+
+        @Override
+        public Story getStoryById(int id) {
+            checkThread();
+            return storyDao.getStoryById(id);
         }
 
         @Override
@@ -145,6 +159,12 @@ public class BehaviorDatabaseHelper {
         public int getBehaviorCount() {
             checkThread();
             return userBehaviorDao.getBehaviorCount();
+        }
+
+        @Override
+        public UserBehavior getBehaviorById(int id) {
+            checkThread();
+            return userBehaviorDao.getBehaviorById(id);
         }
 
         @Override

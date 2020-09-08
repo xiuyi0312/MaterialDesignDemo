@@ -17,6 +17,8 @@ public interface StoryDao {
     List<Story> getStoryDuring(long startTime, long endTime);
     @Query("select count(*) from story")
     int getStoryCount();
+    @Query("select * from story where id = :id")
+    Story getStoryById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Story... stories);

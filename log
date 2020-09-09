@@ -1,18 +1,14 @@
 1---NavigationView
-2---FloatingActionBar + SnackBar
-3---Record your reading footprint
-    when    checked     finished    comment(add delete check and update)     shared
-4---Show the footprint in Calendar
-5---NavigationView
     header ----Date + Weather +
     menu
            ----footprint
            ----settings
            ----about
-
-
-
-6 instructions for usage of ROOM
+2---FloatingActionBar + SnackBar
+3---Record your reading footprint
+    when    checked     finished    comment(add delete check and update)     shared
+4---Show the footprint in Calendar
+5---instructions for usage of ROOM
     add dependencies
     create Class annotated with @Entity
     create Dao Class annotated with @Dao

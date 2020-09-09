@@ -1,6 +1,7 @@
 package com.op.materialdesigndemo.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -135,7 +136,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.footprint) {
-
+            binding.drawer.closeDrawer(GravityCompat.START);
+            startActivity(new Intent(this, FootprintActivity.class));
         } else if (item.getItemId() == R.id.settings) {
 
         } else if (item.getItemId() == R.id.about) {

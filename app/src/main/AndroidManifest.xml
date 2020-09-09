@@ -24,6 +24,9 @@
         <activity
             android:name=".ui.DetailActivity"
             android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".ui.FootprintActivity"
+            android:theme="@style/NoActionBar" />
     </application>
 
 </manifest>

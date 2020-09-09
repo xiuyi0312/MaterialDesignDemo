@@ -2,6 +2,7 @@ package com.op.materialdesigndemo.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -98,7 +99,7 @@ public class UserBehavior implements Parcelable {
     }
 
     public boolean hasComment() {
-        return (opType & OP_COMMENT) > 0;
+        return (opType & OP_COMMENT) > 0 && !TextUtils.isEmpty(comment);
     }
 
     public boolean hasClicked() {

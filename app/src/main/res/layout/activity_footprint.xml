@@ -34,7 +34,9 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:weekDayTextAppearance="@color/colorPrimary"
+                android:showWeekNumber="false"
+                android:weekDayTextAppearance="@style/FootprintHeaderTextAppearance"
+                android:dateTextAppearance="@style/FootprintTextAppearance"
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

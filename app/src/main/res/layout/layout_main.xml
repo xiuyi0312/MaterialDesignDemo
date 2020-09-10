@@ -21,7 +21,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:navigationIcon="@drawable/ic_menu"
-                app:title="Home" />
+                app:title="News" />
 
         </com.google.android.material.appbar.AppBarLayout>
 

@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.op.materialdesigndemo.R;
 import com.op.materialdesigndemo.db.BehaviorDatabaseHelper;
 import com.op.materialdesigndemo.entity.NewsResp;
@@ -21,6 +22,7 @@ import com.op.materialdesigndemo.http.ApiException;
 import com.op.materialdesigndemo.http.HttpCallback;
 import com.op.materialdesigndemo.http.RetrofitManager;
 
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -72,6 +74,9 @@ public class NewsViewModel extends AndroidViewModel {
                     }
                 });
 
+//        Type type = new TypeToken<List<Story>>() {}/*is a subclass of TypeToken<T> and can getGenericSuperclass */.getType();
+//        Class<? super List<Story>> rawType = new TypeToken<List<Story>>() {}.getRawType();
+//        Log.d("News", type.getTypeName());
 //        RetrofitManager.getInstance().get(
 //                "api/4/news/latest", new HashMap<String, String>(),//参数部分
 //                new TypeToken<List<Story>>() {}.getType()
